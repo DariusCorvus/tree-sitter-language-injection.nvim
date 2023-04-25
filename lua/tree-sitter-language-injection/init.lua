@@ -1,4 +1,5 @@
 local runtime_path = vim.api.nvim_list_runtime_paths()[1]
+local after_path = runtime_path .. "/after"
 local queries_path = runtime_path .. "/after/queries"
 
 local queries = {
@@ -42,6 +43,9 @@ local function write(lang, file, content)
 end
 
 local function init()
+	if vim.fn.isdirectory(after_path) == 0 then
+		vim.fn.mkdir(after_path)
+	end
 	if vim.fn.isdirectory(queries_path) == 0 then
 		vim.fn.mkdir(queries_path)
 	end
