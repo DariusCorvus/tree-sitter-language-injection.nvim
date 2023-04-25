@@ -1,6 +1,17 @@
 # tree-sitter-language-injection.nvim
 A NVIM Plugin which applies inline language injections, when a string contains a comment with the language name.
 
+## Installation
+### Packer
+```lua
+use({"dariuscorvus/tree-sitter-language-injection.nvim", after="nvim-treesitter"})
+```
+
+### Setup
+```lua
+require("tree-sitter-language-injection").setup()
+```
+
 ## Features
 ### Comment Inline
 When a string is found, and the first line is language specifc comment, for the desired language, followed by the language name, syntax highlighting gets applied.
