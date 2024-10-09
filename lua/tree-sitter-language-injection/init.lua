@@ -6,7 +6,7 @@ local templates = {
   python = {
     string = [[
 
-    ]]
+    ]],
     comment = [[
 
     ]]
