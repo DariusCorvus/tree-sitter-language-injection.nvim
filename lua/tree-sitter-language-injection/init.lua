@@ -3,22 +3,21 @@ local after_path = runtime_path .. "/after"
 local queries_path = runtime_path .. "/after/queries"
 
 local templates = {
-  python = {
-    string = {
-      langs = {
-        { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
-        { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" }
-      },
-      query = [[
+    python = {
+        string = {
+            langs = {
+                { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
+                { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" }
+            },
+            query = [[
 ; query
 ;; string {lang} injection
 ((string_content) @injection.content 
                    (#match? @injection.content "{match}")
                    (#set! injection.language "{name}"))
-      ]],
-    },
-
-  }
+            ]]
+        }
+    }
 }
 --     comment = {
 --       match = "( )*{lang}( )*",
@@ -80,13 +79,18 @@ local function init()
     for type, typeData in pairs(langData) do
         for _, entry in ipairs(typeData.langs) do
             -- Replace placeholders in the query string
-            local query = typeData.query
-            query = query:gsub("{lang}", entry.name)  -- Replace {lang}
-            query = query:gsub("{match}", entry.match)  -- Replace {match}
-            query = query:gsub("{name}", entry.name)  -- Replace {name}
+        if typeData.langs and typeData.query then  -- Check if langs and query exist
+            for _, entry in ipairs(typeData.langs) do
+                -- Replace placeholders in the query string
+                local query = typeData.query
+                query = query:gsub("{lang}", entry.name)  -- Replace {lang}
+                query = query:gsub("{match}", entry.match)  -- Replace {match}
+                query = query:gsub("{name}", entry.name)  -- Replace {name}
 
-            -- Concatenate the modified query string
-            result = result .. "\n" .. query
+                -- Concatenate the modified query string
+                -- table.insert(result, query)
+                result = result .. "\n" .. query
+            end
         end
     end
 
