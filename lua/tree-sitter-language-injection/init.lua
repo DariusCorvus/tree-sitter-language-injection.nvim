@@ -4,99 +4,38 @@ local queries_path = runtime_path .. "/after/queries"
 
 local templates = {
   python = {
-    string = [[
+    string = {
+      langs = {
+        { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" }
+        { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" }
+      },
+      query = [[
 ; query
 ;; string {lang} injection
 ((string_content) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*{pattern}")
-                   (#set! injection.language "{lang}"))
-    ]],
-    comment = [[
-; query
-;; comment {lang} injection
-((comment) @comment .
-           (expression_statement
-             (assignment right: 
-              (string
-                (string_content)
-                @injection.content
-                (#match? @comment "( )*[sS][qQ][lL]( )*") 
-                (#set! injection.language "sql")))))
-    ]]
+                   (#match? @injection.content "{match}")
+                   (#set! injection.language "{name}"))
+      ]],
+    },
+
   }
 }
+--     comment = {
+--       match = "( )*{lang}( )*",
+--       query = [[
+-- ; query
+-- ;; comment {lang} injection
+-- ((comment) @comment .
+--            (expression_statement
+--              (assignment right: 
+--               (string
+--                 (string_content)
+--                 @injection.content
+--                 (#match? @comment "{match}") 
+--                 (#set! injection.language "{lang}")))))
+--       ]]
+--     }
 
-local queries = {
-	python = {
-		injections = [[
-;; query
-; extends
-;; STRING SQL INJECTION
-(
- (string_content) @injection.content 
- (#match? @injection.content "^\n*( )*-{2,}( )*[sS][qQ][lL]( )*\n") 
- (#set! injection.language "sql"))
-
-;; COMMENT SQL INJECTION
-((comment) @comment .
-           (expression_statement
-             (assignment right: 
-              (string
-                (string_content)
-                @injection.content
-                (#match? @comment "( )*[sS][qQ][lL]( )*") 
-                (#set! injection.language "sql")))))
-		]],
-	},
-	typescript = {
-		injections = [[
-;; query
-; extends
-;; STRING SQL INJECTION
-((string_fragment) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*[sS][qQ][lL]")
-                   (#set! injection.language "sql"))
-
-;; COMMENT SQL INJECTION
-((comment)
- @comment .
- (lexical_declaration
-   (variable_declarator 
-     value: [
-             (string(string_fragment)@injection.content) 
-             (template_string(string_fragment)@injection.content)
-             ]@injection.content)  
-   )
-  (#match? @comment "^//( )*[sS][qQ][lL]")
-  (#set! injection.language "sql")
- )
-		]],
-	},
-	javascript = {
-		injections = [[
-;; query
-; extends
-;; STRING SQL INJECTION
-((string_fragment) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*[sS][qQ][lL]")
-                   (#set! injection.language "sql"))
-
-;; COMMENT SQL INJECTION
-((comment)
- @comment .
- (lexical_declaration
-   (variable_declarator 
-     value: [
-             (string(string_fragment)@injection.content) 
-             (template_string(string_fragment)@injection.content)
-             ]@injection.content)  
-   )
-  (#match? @comment "^//( )*[sS][qQ][lL]")
-  (#set! injection.language "sql")
- )
-		]],
-	},
-}
 
 local function createCaseInsensitivePattern(str)
     local pattern = str:gsub(".", function(c)
@@ -131,16 +70,26 @@ local function init()
 	if vim.fn.isdirectory(queries_path) == 0 then
 		vim.fn.mkdir(queries_path)
 	end
-	for lang, value in pairs(queries) do
-		for file, content in pairs(value) do
-			write(lang, file, content)
-		end
-	end
+	-- for lang, value in pairs(queries) do
+	-- 	for file, content in pairs(value) do
+	-- 		write(lang, file, content)
+	-- 	end
+	-- end
   for lang, value in pairs(templates) do
-    local query = ";extends\n"
-    for type, content in pairs(value) do
-      query = query .. createLanguageInjection(content, "sql")
+    local result = ";extends\n"
+    for type, typeData in pairs(langData) do
+        for _, entry in ipairs(typeData.langs) do
+            -- Replace placeholders in the query string
+            local query = typeData.query
+            query = query:gsub("{lang}", entry.name)  -- Replace {lang}
+            query = query:gsub("{match}", entry.match)  -- Replace {match}
+            query = query:gsub("{name}", entry.name)  -- Replace {name}
+
+            -- Concatenate the modified query string
+            result = result .. "\n" .. query
+        end
     end
+
     write(lang, "injections", query)
   end
 end
