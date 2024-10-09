@@ -74,18 +74,18 @@ local queries = {
 	},
 }
 
-local function createLanguageInjection(query, lang)
-  local pattern = createCaseInsensitivePattern(lang)
-  query = query:gsub("{lang}", lang)
-  query = query:gsub("{pattern}", pattern)
-  return query
-end
-
 local function createCaseInsensitivePattern(str)
     local pattern = str:gsub(".", function(c)
         return "[" .. c:lower() .. c:upper() .. "]"
     end)
     return pattern
+end
+
+local function createLanguageInjection(query, lang)
+  local pattern = createCaseInsensitivePattern(lang)
+  query = query:gsub("{lang}", lang)
+  query = query:gsub("{pattern}", pattern)
+  return query
 end
 
 local function write(lang, file, content)
