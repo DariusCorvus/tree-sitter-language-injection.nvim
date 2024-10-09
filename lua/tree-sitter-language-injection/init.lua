@@ -6,7 +6,7 @@ local templates = {
   python = {
     string = {
       langs = {
-        { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" }
+        { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
         { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" }
       },
       query = [[
