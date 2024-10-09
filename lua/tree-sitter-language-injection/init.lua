@@ -77,7 +77,6 @@ local function init()
   for lang, value in pairs(templates) do
     local result = ";extends\n"
     for type, typeData in pairs(langData) do
-        for _, entry in ipairs(typeData.langs) do
             -- Replace placeholders in the query string
         if typeData.langs and typeData.query then  -- Check if langs and query exist
             for _, entry in ipairs(typeData.langs) do
