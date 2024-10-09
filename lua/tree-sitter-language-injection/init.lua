@@ -7,7 +7,7 @@ local templates = {
     string = [[
 ; query
 ;; string {lang} injection
-((string_fragment) @injection.content 
+((string_content) @injection.content 
                    (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*{pattern}")
                    (#set! injection.language "{lang}"))
     ]],
