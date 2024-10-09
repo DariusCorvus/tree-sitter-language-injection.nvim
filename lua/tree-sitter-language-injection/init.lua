@@ -137,7 +137,7 @@ local function init()
 		end
 	end
   for lang, value in pairs(templates) do
-    local query = ";extends"
+    local query = ";extends\n"
     for type, content in pairs(value) do
       query = query .. createLanguageInjection(content, "sql")
     end
