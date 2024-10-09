@@ -2,6 +2,17 @@ local runtime_path = vim.api.nvim_list_runtime_paths()[1]
 local after_path = runtime_path .. "/after"
 local queries_path = runtime_path .. "/after/queries"
 
+local templates = {
+  python = {
+    string = [[
+
+    ]]
+    comment = [[
+
+    ]]
+  }
+}
+
 local queries = {
 	python = {
 		injections = [[
@@ -116,8 +127,8 @@ local function init()
 ;query
 ;extends
 ((string_fragment) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*[sS][qQ][lL]")
-                   (#set! injection.language "sql"))
+                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*{pattern}")
+                   (#set! injection.language "{lang}"))
   ]], "sql"))
 end
 
