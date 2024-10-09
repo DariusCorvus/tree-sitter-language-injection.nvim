@@ -5,10 +5,23 @@ local queries_path = runtime_path .. "/after/queries"
 local templates = {
   python = {
     string = [[
-
+; query
+;; string {lang} injection
+((string_fragment) @injection.content 
+                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*{pattern}")
+                   (#set! injection.language "{lang}"))
     ]],
     comment = [[
-
+; query
+;; comment {lang} injection
+((comment) @comment .
+           (expression_statement
+             (assignment right: 
+              (string
+                (string_content)
+                @injection.content
+                (#match? @comment "( )*[sS][qQ][lL]( )*") 
+                (#set! injection.language "sql")))))
     ]]
   }
 }
@@ -123,14 +136,13 @@ local function init()
 			write(lang, file, content)
 		end
 	end
-  write("test", "injections", createLanguageInjection([[
-;query
-;extends
-;; inline {lang} injection
-((string_fragment) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*{pattern}")
-                   (#set! injection.language "{lang}"))
-  ]], "sql"))
+  for lang, value in pairs(templates) do
+    local query = ";extends"
+    for type, content in pairs(value) do
+      query = query .. createLanguageInjection(content, "sql")
+    end
+    write(lang, "injections", query)
+  end
 end
 
 local function setup()
