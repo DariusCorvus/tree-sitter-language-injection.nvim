@@ -74,6 +74,20 @@ local queries = {
 	},
 }
 
+local function createLanguageInjection(query, lang)
+  local pattern = createCaseInsensitivePattern(lang)
+  query = query:gsub("{lang}", lang)
+  query = query:gsub("{pattern}", pattern)
+  return query
+end
+
+local function createCaseInsensitivePattern(str)
+    local pattern = str:gsub(".", function(c)
+        return "[" .. c:lower() .. c:upper() .. "]"
+    end)
+    return pattern
+end
+
 local function write(lang, file, content)
 	local lang_path = queries_path .. "/" .. lang
 	if vim.fn.isdirectory(lang_path) == 0 then
@@ -98,6 +112,13 @@ local function init()
 			write(lang, file, content)
 		end
 	end
+  write("test", "injections", createLanguageInjection([[
+;query
+;extends
+((string_fragment) @injection.content 
+                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*[sS][qQ][lL]")
+                   (#set! injection.language "sql"))
+  ]], "sql"))
 end
 
 local function setup()
