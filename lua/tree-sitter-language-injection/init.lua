@@ -74,7 +74,7 @@ local function init()
 	-- 		write(lang, file, content)
 	-- 	end
 	-- end
-  for lang, value in pairs(templates) do
+  for lang, langData in pairs(templates) do
     local result = ";extends\n"
     for type, typeData in pairs(langData) do
             -- Replace placeholders in the query string
