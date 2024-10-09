@@ -90,7 +90,7 @@ local function init()
         end
     end
 
-    write(lang, "injections", query)
+    write(lang, "injections", result)
   end
 end
 
