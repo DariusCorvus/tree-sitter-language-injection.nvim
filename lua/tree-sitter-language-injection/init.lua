@@ -8,7 +8,20 @@ local queries = {
 ;; query
 ; extends
 ;; STRING SQL INJECTION
-((string_content) @sql (#match? @sql "^\n*( )*-{2,}( )*[sS][qQ][lL]( )*\n"))
+(
+ (string_content) @injection.content 
+ (#match? @injection.content "^\n*( )*-{2,}( )*[sS][qQ][lL]( )*\n") 
+ (#set! injection.language "sql"))
+
+;; COMMENT SQL INJECTION
+((comment) @comment
+           (expression_statement
+             (assignment right: 
+              (string
+                (string_content)
+                @injection.content
+                (#match? @comment "( )*[sS][qQ][lL]( )*") 
+                (#set! injection.language "sql")))))
 
 ;; STRING SURREALDB INJECTION
 ((string_content) @surrealdb (#match? @surrealdb "^\n*( )*-{2,}( )*[sS][uU][rR][qQ][lL]( )*\n"))
