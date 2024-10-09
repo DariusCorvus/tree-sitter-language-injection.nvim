@@ -126,6 +126,7 @@ local function init()
   write("test", "injections", createLanguageInjection([[
 ;query
 ;extends
+;; inline {lang} injection
 ((string_fragment) @injection.content 
                    (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*{pattern}")
                    (#set! injection.language "{lang}"))
