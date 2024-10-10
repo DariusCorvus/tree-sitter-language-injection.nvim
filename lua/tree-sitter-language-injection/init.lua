@@ -8,6 +8,7 @@ local templates = {
             langs = {
                 { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
                 { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" }
+                { name = "html", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" }
             },
             query = [[
 ; query
@@ -16,25 +17,28 @@ local templates = {
                    (#match? @injection.content "{match}")
                    (#set! injection.language "{name}"))
             ]]
+        },
+        comment = {
+            langs = {
+              { name = "sql", match = "( )*{lang}( )*"},
+              { name = "javascript", match = "( )*{lang}( )*"},
+              { name = "html", match = "( )*{lang}( )*"},
+            },
+            query = [[
+; query
+;; comment {lang} injection
+((comment) @comment .
+    (expression_statement
+      (assignment right: 
+        (string
+          (string_content)
+          @injection.content
+          (#match? @comment "{match}") 
+          (#set! injection.language "{lang}")))))
+            ]]
         }
     }
 }
---     comment = {
---       match = "( )*{lang}( )*",
---       query = [[
--- ; query
--- ;; comment {lang} injection
--- ((comment) @comment .
---            (expression_statement
---              (assignment right: 
---               (string
---                 (string_content)
---                 @injection.content
---                 (#match? @comment "{match}") 
---                 (#set! injection.language "{lang}")))))
---       ]]
---     }
-
 
 local function createCaseInsensitivePattern(str)
     local pattern = str:gsub(".", function(c)
@@ -69,11 +73,6 @@ local function init()
 	if vim.fn.isdirectory(queries_path) == 0 then
 		vim.fn.mkdir(queries_path)
 	end
-	-- for lang, value in pairs(queries) do
-	-- 	for file, content in pairs(value) do
-	-- 		write(lang, file, content)
-	-- 	end
-	-- end
   for lang, langData in pairs(templates) do
     local result = ";extends\n"
     for type, typeData in pairs(langData) do
@@ -83,11 +82,10 @@ local function init()
                 -- Replace placeholders in the query string
                 local query = typeData.query
                 query = query:gsub("{match}", entry.match:gsub("\r\n", "\\r\\n"):gsub("\r", "\\r"):gsub("\n", "\\n"))  -- Replace {match} (double escaping)
-                query = query:gsub("{lang}", entry.name)  -- Replace {lang}
-                query = query:gsub("{name}", entry.name)  -- Replace {name}
+                query = query:gsub("{lang}", createCaseInsensitivePattern(entry.name))
+                query = query:gsub("{name}", entry.name)
 
                 -- Concatenate the modified query string
-                -- table.insert(result, query)
                 result = result .. "\n" .. query
             end
         end
