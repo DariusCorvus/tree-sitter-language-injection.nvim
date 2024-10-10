@@ -20,9 +20,9 @@ local templates = {
         },
         comment = {
             langs = {
-              { name = "sql", match = "( )*{lang}( )*"},
-      -- { name = "javascript", match = "( )*{lang}( )*"},
-      -- { name = "html", match = "( )*{lang}( )*"},
+              { name = "sql", match = "^#+( )*{lang}( )*"},
+              { name = "javascript", match = "^#+( )*{lang}( )*"},
+              { name = "html", match = "^#+( )*{lang}( )*"},
             },
             query = [[
 ; query
