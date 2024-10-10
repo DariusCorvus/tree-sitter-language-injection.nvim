@@ -16,27 +16,27 @@ local templates = {
 ((string_content) @injection.content 
                    (#match? @injection.content "{match}")
                    (#set! injection.language "{name}"))
-            ]]
+]]
         },
---         comment = {
---             langs = {
---               { name = "sql", match = "( )*{lang}( )*"},
---               { name = "javascript", match = "( )*{lang}( )*"},
---               { name = "html", match = "( )*{lang}( )*"},
---             },
---             query = [[
--- ; query
--- ;; comment {name} injection
--- ((comment) @comment .
---     (expression_statement
---       (assignment right: 
---         (string
---           (string_content)
---           @injection.content
---           (#match? @comment "{match}") 
---           (#set! injection.language "{name}")))))
---             ]]
---         }
+        comment = {
+            langs = {
+              { name = "sql", match = "( )*{lang}( )*"},
+      -- { name = "javascript", match = "( )*{lang}( )*"},
+      -- { name = "html", match = "( )*{lang}( )*"},
+            },
+            query = [[
+; query
+;; comment {name} injection
+((comment) @comment .
+           (expression_statement
+             (assignment right: 
+                         (string
+                           (string_content)
+                           @injection.content 
+                           (#match? @comment "{match}") 
+                           (#set! injection.language "{lang}")))))
+]]
+        }
     }
 }
 
