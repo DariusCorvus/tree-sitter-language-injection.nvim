@@ -12,7 +12,7 @@ local templates = {
             },
             query = [[
 ; query
-;; string {lang} injection
+;; string {name} injection
 ((string_content) @injection.content 
                    (#match? @injection.content "{match}")
                    (#set! injection.language "{name}"))
@@ -26,7 +26,7 @@ local templates = {
             },
             query = [[
 ; query
-;; comment {lang} injection
+;; comment {name} injection
 ((comment) @comment .
     (expression_statement
       (assignment right: 
@@ -34,7 +34,7 @@ local templates = {
           (string_content)
           @injection.content
           (#match? @comment "{match}") 
-          (#set! injection.language "{lang}")))))
+          (#set! injection.language "{name}")))))
             ]]
         }
     }
