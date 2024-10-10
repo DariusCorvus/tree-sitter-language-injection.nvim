@@ -9,6 +9,7 @@ local templates = {
                 { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
                 { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" },
                 { name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" }
+                { name ="css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" }
             },
             query = [[
 ; query
@@ -23,6 +24,7 @@ local templates = {
               { name = "sql", match = "^#+( )*{lang}( )*"},
               { name = "javascript", match = "^#+( )*{lang}( )*"},
               { name = "html", match = "^#+( )*{lang}( )*"},
+              { name = "css", match = "^#+( )*{lang}( )*"},
             },
             query = [[
 ; query
