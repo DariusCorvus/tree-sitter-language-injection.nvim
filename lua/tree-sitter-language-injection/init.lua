@@ -81,7 +81,8 @@ local function init()
             for _, entry in ipairs(typeData.langs) do
                 -- Replace placeholders in the query string
                 local query = typeData.query
-                query = query:gsub("{match}", entry.match:gsub("\\", "\\\\"):gsub("\r\n", "\\r\\n"):gsub("\r", "\\r"):gsub("\n", "\\n"))  -- Replace {match} (double escaping)
+                local transformed_match = entry.match:gsub("\\", "\\\\"):gsub("\r\n", "\\r\\n"):gsub("\r", "\\r"):gsub("\n", "\\n")
+                query = query:gsub("{match}", transformed_match)  -- Replace {match} (double escaping)
                 query = query:gsub("{lang}", createCaseInsensitivePattern(entry.name))
                 query = query:gsub("{name}", entry.name)
 
