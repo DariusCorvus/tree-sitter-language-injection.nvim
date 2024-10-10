@@ -41,7 +41,59 @@ which results in
 
 ![typescript_above_sql](https://raw.githubusercontent.com/DariusCorvus/DariusCorvus/main/assets/wezterm-gui_WDmWbPhxb9.png)
 
+### Configuration Of A New Language
+
+To add as example `javascript` `sql` string inline comment language injection you need to provide the query for `string` and the `langs`` you want to match, the`name` is the name of the treesitter parser and the match is the pattern to match the comment inside a string.
+
+To add as example `javascript` `sql` comment above language injection you need to provide the query for `comment` and the `langs` you want to match, the name is the name of the treesitter parser and the match is the pattern to match the comment.
+
+it's already inbuilt by the way, so tinker with a language you need or create a issue and i see if i can help.
+
+```lua
+return {
+  "dariuscorvus/tree-sitter-language-injection.nvim",
+  opts = {
+    javascript = {
+      string = {
+        langs = {
+          { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}"}
+        },
+        query = [[
+; query
+;; string {name} injection
+((string_fragment) @injection.content
+                   (#match? @injection.content "{match}")
+                   (#set! injection.language "{name}"))
+        ]]
+      },
+      comment = {
+        langs = {
+          { name = "sql", match = "^//+( )*{lang}( )*"}
+        },
+        query = [[
+; query
+;; comment {name} injection
+((comment)
+ @comment .
+ (lexical_declaration
+   (variable_declarator
+     value: [
+             (string(string_fragment)@injection.content)
+             (template_string(string_fragment)@injection.content)
+             ]@injection.content)
+   )
+  (#match? @comment "{match}")
+  (#set! injection.language "{name}")
+ )
+        ]]
+      }
+    }
+  }
+}
+```
+
 ### Configurable
+
 Now its possible to add languages and their treesitter scm quiries via the setup.
 
 before the configuration:
@@ -75,11 +127,9 @@ require("tree-sitter-language-injection").setup()
 ```lua
 return {
   "dariuscorvus/tree-sitter-language-injection.nvim",
-  branch = "dev",
   opts = {} 'calls the setup
 }
 ```
-
 
 ## Built In Languages
 
@@ -96,3 +146,8 @@ return {
     - `typescript`
     - `html`
     - `css`
+- javascript
+  - comment inline
+    - `sql`
+  - comment above
+    - `sql`
