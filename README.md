@@ -2,30 +2,6 @@
 
 A NVIM Plugin which applies inline language injections, when a string contains a comment with the language name.
 
-## Installation
-
-### Packer
-
-```lua
-use({"dariuscorvus/tree-sitter-language-injection.nvim", after="nvim-treesitter"})
-```
-
-### Setup
-
-```lua
-require("tree-sitter-language-injection").setup()
-```
-
-### Lazy
-
-```lua
-return {
-  "dariuscorvus/tree-sitter-language-injection.nvim",
-  branch = "dev",
-  opts = {} 'calls the setup
-}
-```
-
 ## Features
 
 ### Comment Inline
@@ -64,25 +40,58 @@ which results in
 
 ![typescript_above_sql](https://raw.githubusercontent.com/DariusCorvus/DariusCorvus/main/assets/wezterm-gui_WDmWbPhxb9.png)
 
-## Supported Languages
+### Configurable
+Now its possible to add languages and their treesitter scm quiries via the setup.
+
+before the configuration:
+
+![Screenshot 2024-10-10 111556](https://github.com/user-attachments/assets/2f92846e-5b8c-4916-b049-7d0b68cc8155)
+
+configuration:
+
+![Screenshot 2024-10-10 111439](https://github.com/user-attachments/assets/788a512f-47ab-49b8-b438-661b746a23c2)
+
+after the configuration:
+
+![Unbenannt](https://github.com/user-attachments/assets/16a48553-653c-4bc3-8b6a-11ed9efcff71)
+
+## Installation
+
+### Packer
+
+```lua
+use({"dariuscorvus/tree-sitter-language-injection.nvim", after="nvim-treesitter"})
+```
+
+### Setup
+
+```lua
+require("tree-sitter-language-injection").setup()
+```
+
+### Lazy
+
+```lua
+return {
+  "dariuscorvus/tree-sitter-language-injection.nvim",
+  branch = "dev",
+  opts = {} 'calls the setup
+}
+```
+
+
+## Built In Languages
 
 - python
   - comment inline
     - `sql`
-    - `surrealdb`
-  - comment above
-    - sql
-- typescript
-  - comment inline
-    - `sql`
-    - `surrealdb`
+    - `javascript`
+    - `typescript`
+    - `html`
+    - `css`
   - comment above
     - `sql`
-    - `surrealdb`
-- javascript
-  - comment inline
-    - `sql`
-    - `surrealdb`
-  - comment above
-    - `sql`
-    - `surrealdb`
+    - `javascript`
+    - `typescript`
+    - `html`
+    - `css`
