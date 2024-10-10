@@ -8,7 +8,7 @@ local templates = {
             langs = {
                 { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
                 { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" },
-                { name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" }
+                { name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
                 { name ="css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" }
             },
             query = [[
