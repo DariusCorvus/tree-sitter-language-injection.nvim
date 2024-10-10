@@ -93,7 +93,7 @@ local function write(lang, file, content)
 end
 
 local function init(config)
-  deepMerge(templates, config)
+  deepMerge(config, templates)
 	if vim.fn.isdirectory(after_path) == 0 then
 		vim.fn.mkdir(after_path)
 	end
