@@ -40,24 +40,31 @@ local templates = {
     }
 }
 
--- Function to merge two tables recursively with proper handling for unique array elements
-function deepMerge(target, source)
+-- Function to merge two tables recursively with overwriting behavior for specific entries
+local function deepMerge(target, source)
     for key, value in pairs(source) do
         if type(value) == "table" and type(target[key]) == "table" then
             -- If both target and source are tables, recursively merge them
             deepMerge(target[key], value)
         elseif type(value) == "table" and #value > 0 then
-            -- If the value is an array, concatenate unique elements
-            target[key] = target[key] or {}
-            local uniqueNames = {}
+            -- If the value is an array, overwrite existing entries based on 'name'
+            target[key] = target[key] or {}  -- Initialize the target array if it doesn't exist
+            
+            -- Create a mapping for existing entries in the target
+            local existingEntries = {}
             for _, entry in ipairs(target[key]) do
-                uniqueNames[entry.name] = true  -- Mark existing names as present
+                existingEntries[entry.name] = entry  -- Store existing entry
             end
+            
+            -- Iterate through source entries
             for _, entry in ipairs(value) do
-                if not uniqueNames[entry.name] then
-                    table.insert(target[key], entry)  -- Add only unique entries
-                    uniqueNames[entry.name] = true
-                end
+                existingEntries[entry.name] = entry  -- This will overwrite the entry if it exists
+            end
+            
+            -- Convert the mapping back to an array
+            target[key] = {}
+            for _, entry in pairs(existingEntries) do
+                table.insert(target[key], entry)
             end
         else
             -- Otherwise, directly assign the value from the source to the target
@@ -93,7 +100,7 @@ local function write(lang, file, content)
 end
 
 local function init(config)
-  deepMerge(config, templates)
+  deepMerge(templates, config)
 	if vim.fn.isdirectory(after_path) == 0 then
 		vim.fn.mkdir(after_path)
 	end
