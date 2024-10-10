@@ -83,7 +83,7 @@ local function init()
                 -- Replace placeholders in the query string
                 local query = typeData.query
                 query = query:gsub("{lang}", entry.name)  -- Replace {lang}
-                query = query:gsub("{match}", entry.match:gsub("\\", "\\\\"):gsub("'", "\\'"))  -- Replace {match} (double escaping)
+                query = query:gsub("{match}", entry.match:gsub("\r\n", "\\r\\n"):gsub("\r", "\\r"):gsub("\n", "\\n"))  -- Replace {match} (double escaping)
                 query = query:gsub("{name}", entry.name)  -- Replace {name}
 
                 -- Concatenate the modified query string
