@@ -40,6 +40,32 @@ local templates = {
     }
 }
 
+-- Function to merge two tables recursively
+local function deepMerge(target, source)
+    for key, value in pairs(source) do
+        if type(value) == "table" and type(target[key]) == "table" then
+            -- If both target and source are tables, recursively merge them
+            deepMerge(target[key], value)
+        elseif type(value) == "table" and #value > 0 then
+            -- If the value is an array, concatenate unique elements
+            target[key] = target[key] or {}
+            local uniqueNames = {}
+            for _, entry in ipairs(target[key]) do
+                uniqueNames[entry.name] = true
+            end
+            for _, entry in ipairs(value) do
+                if not uniqueNames[entry.name] then
+                    table.insert(target[key], entry)
+                    uniqueNames[entry.name] = true
+                end
+            end
+        else
+            -- Otherwise, directly assign the value from the source to the target
+            target[key] = value
+        end
+    end
+end
+
 local function createCaseInsensitivePattern(str)
     local pattern = str:gsub(".", function(c)
         return "[" .. c:lower() .. c:upper() .. "]"
@@ -66,7 +92,8 @@ local function write(lang, file, content)
 	io.close(file_handle)
 end
 
-local function init()
+local function init(config)
+  deepMerge(templates, config)
 	if vim.fn.isdirectory(after_path) == 0 then
 		vim.fn.mkdir(after_path)
 	end
@@ -96,8 +123,8 @@ local function init()
   end
 end
 
-local function setup()
-	init()
+local function setup(config)
+	init(config)
 end
 
 return { setup = setup }
