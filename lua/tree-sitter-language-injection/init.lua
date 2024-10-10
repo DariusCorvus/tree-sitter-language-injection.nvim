@@ -34,7 +34,7 @@ local templates = {
                            (string_content)
                            @injection.content 
                            (#match? @comment "{match}") 
-                           (#set! injection.language "{lang}")))))
+                           (#set! injection.language "{name}")))))
 ]]
         }
     }
