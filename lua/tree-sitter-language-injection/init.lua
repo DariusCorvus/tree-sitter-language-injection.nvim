@@ -40,31 +40,31 @@ local templates = {
     }
 }
 
--- Function to merge two tables recursively with overwriting behavior for specific entries
+-- Function to merge two tables recursively
 local function deepMerge(target, source)
     for key, value in pairs(source) do
         if type(value) == "table" and type(target[key]) == "table" then
-            -- If both target and source are tables, recursively merge them
-            deepMerge(target[key], value)
-        elseif type(value) == "table" and #value > 0 then
-            -- If the value is an array, overwrite existing entries based on 'name'
-            target[key] = target[key] or {}  -- Initialize the target array if it doesn't exist
-            
-            -- Create a mapping for existing entries in the target
-            local existingEntries = {}
-            for _, entry in ipairs(target[key]) do
-                existingEntries[entry.name] = entry  -- Store existing entry
-            end
-            
-            -- Iterate through source entries
-            for _, entry in ipairs(value) do
-                existingEntries[entry.name] = entry  -- This will overwrite the entry if it exists
-            end
-            
-            -- Convert the mapping back to an array
-            target[key] = {}
-            for _, entry in pairs(existingEntries) do
-                table.insert(target[key], entry)
+            if key == "langs" then
+                -- Concatenate the langs arrays and ensure uniqueness
+                local existingEntries = {}
+                -- Add existing entries to the map for uniqueness
+                for _, entry in ipairs(target[key]) do
+                    existingEntries[entry.name] = entry
+                end
+                
+                -- Add new entries from the source to the map
+                for _, entry in ipairs(value) do
+                    existingEntries[entry.name] = entry  -- This will overwrite the entry if it exists
+                end
+                
+                -- Convert the mapping back to an array (ensuring uniqueness)
+                target[key] = {}
+                for _, entry in pairs(existingEntries) do
+                    table.insert(target[key], entry)
+                end
+            else
+                -- If the key is not "langs", just perform a regular merge
+                deepMerge(target[key], value)
             end
         else
             -- Otherwise, directly assign the value from the source to the target
