@@ -40,8 +40,8 @@ local templates = {
     }
 }
 
--- Function to merge two tables recursively
-local function deepMerge(target, source)
+-- Function to merge two tables recursively with proper handling for unique array elements
+function deepMerge(target, source)
     for key, value in pairs(source) do
         if type(value) == "table" and type(target[key]) == "table" then
             -- If both target and source are tables, recursively merge them
@@ -51,11 +51,11 @@ local function deepMerge(target, source)
             target[key] = target[key] or {}
             local uniqueNames = {}
             for _, entry in ipairs(target[key]) do
-                uniqueNames[entry.name] = true
+                uniqueNames[entry.name] = true  -- Mark existing names as present
             end
             for _, entry in ipairs(value) do
                 if not uniqueNames[entry.name] then
-                    table.insert(target[key], entry)
+                    table.insert(target[key], entry)  -- Add only unique entries
                     uniqueNames[entry.name] = true
                 end
             end
