@@ -2,77 +2,94 @@ local runtime_path = vim.api.nvim_list_runtime_paths()[1]
 local after_path = runtime_path .. "/after"
 local queries_path = runtime_path .. "/after/queries"
 
-local queries = {
-	python = {
-		injections = [[
-;; query
-; extends
-;; STRING SQL INJECTION
-(
- (string_content) @injection.content 
- (#match? @injection.content "^\n*( )*-{2,}( )*[sS][qQ][lL]( )*\n") 
- (#set! injection.language "sql"))
-
-;; COMMENT SQL INJECTION
+local templates = {
+    python = {
+        string = {
+            langs = {
+                { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
+                { name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" },
+                { name = "typescript", match ="^(\r\n|\r|\n)//+( )*{lang}" },
+                { name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
+                { name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" }
+            },
+            query = [[
+; query
+;; string {name} injection
+((string_content) @injection.content 
+                   (#match? @injection.content "{match}")
+                   (#set! injection.language "{name}"))
+]]
+        },
+        comment = {
+            langs = {
+              { name = "sql", match = "^#+( )*{lang}( )*"},
+              { name = "javascript", match = "^#+( )*{lang}( )*"},
+              { name = "typescript", match = "^#+( )*{lang}( )*"},
+              { name = "html", match = "^#+( )*{lang}( )*"},
+              { name = "css", match = "^#+( )*{lang}( )*"},
+            },
+            query = [[
+; query
+;; comment {name} injection
 ((comment) @comment .
            (expression_statement
              (assignment right: 
-              (string
-                (string_content)
-                @injection.content
-                (#match? @comment "( )*[sS][qQ][lL]( )*") 
-                (#set! injection.language "sql")))))
-		]],
-	},
-	typescript = {
-		injections = [[
-;; query
-; extends
-;; STRING SQL INJECTION
-((string_fragment) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*[sS][qQ][lL]")
-                   (#set! injection.language "sql"))
-
-;; COMMENT SQL INJECTION
-((comment)
- @comment .
- (lexical_declaration
-   (variable_declarator 
-     value: [
-             (string(string_fragment)@injection.content) 
-             (template_string(string_fragment)@injection.content)
-             ]@injection.content)  
-   )
-  (#match? @comment "^//( )*[sS][qQ][lL]")
-  (#set! injection.language "sql")
- )
-		]],
-	},
-	javascript = {
-		injections = [[
-;; query
-; extends
-;; STRING SQL INJECTION
-((string_fragment) @injection.content 
-                   (#match? @injection.content "^(\r\n|\r|\n)*-{2,}( )*[sS][qQ][lL]")
-                   (#set! injection.language "sql"))
-
-;; COMMENT SQL INJECTION
-((comment)
- @comment .
- (lexical_declaration
-   (variable_declarator 
-     value: [
-             (string(string_fragment)@injection.content) 
-             (template_string(string_fragment)@injection.content)
-             ]@injection.content)  
-   )
-  (#match? @comment "^//( )*[sS][qQ][lL]")
-  (#set! injection.language "sql")
- )
-		]],
-	},
+                         (string
+                           (string_content)
+                           @injection.content 
+                           (#match? @comment "{match}") 
+                           (#set! injection.language "{name}")))))
+]]
+        }
+    }
 }
+
+-- Function to merge two tables recursively
+local function deepMerge(target, source)
+    for key, value in pairs(source) do
+        if type(value) == "table" and type(target[key]) == "table" then
+            if key == "langs" then
+                -- Concatenate the langs arrays and ensure uniqueness
+                local existingEntries = {}
+                -- Add existing entries to the map for uniqueness
+                for _, entry in ipairs(target[key]) do
+                    existingEntries[entry.name] = entry
+                end
+                
+                -- Add new entries from the source to the map
+                for _, entry in ipairs(value) do
+                    existingEntries[entry.name] = entry  -- This will overwrite the entry if it exists
+                end
+                
+                -- Convert the mapping back to an array (ensuring uniqueness)
+                target[key] = {}
+                for _, entry in pairs(existingEntries) do
+                    table.insert(target[key], entry)
+                end
+            else
+                -- If the key is not "langs", just perform a regular merge
+                deepMerge(target[key], value)
+            end
+        else
+            -- Otherwise, directly assign the value from the source to the target
+            target[key] = value
+        end
+    end
+end
+
+local function createCaseInsensitivePattern(str)
+    local pattern = str:gsub(".", function(c)
+        return "[" .. c:lower() .. c:upper() .. "]"
+    end)
+    return pattern
+end
+
+local function createLanguageInjection(query, lang)
+  local pattern = createCaseInsensitivePattern(lang)
+  query = query:gsub("{lang}", lang)
+  query = query:gsub("{pattern}", pattern)
+  return query
+end
 
 local function write(lang, file, content)
 	local lang_path = queries_path .. "/" .. lang
@@ -86,22 +103,39 @@ local function write(lang, file, content)
 	io.close(file_handle)
 end
 
-local function init()
+local function init(config)
+  deepMerge(templates, config)
 	if vim.fn.isdirectory(after_path) == 0 then
 		vim.fn.mkdir(after_path)
 	end
 	if vim.fn.isdirectory(queries_path) == 0 then
 		vim.fn.mkdir(queries_path)
 	end
-	for lang, value in pairs(queries) do
-		for file, content in pairs(value) do
-			write(lang, file, content)
-		end
-	end
+  for lang, langData in pairs(templates) do
+    local result = ";extends\n"
+    for type, typeData in pairs(langData) do
+            -- Replace placeholders in the query string
+        if typeData.langs and typeData.query then  -- Check if langs and query exist
+            for _, entry in ipairs(typeData.langs) do
+                -- Replace placeholders in the query string
+                local query = typeData.query
+                local transformed_match = entry.match:gsub("\\", "\\\\"):gsub("\r\n", "\\r\\n"):gsub("\r", "\\r"):gsub("\n", "\\n")
+                query = query:gsub("{match}", transformed_match)  -- Replace {match} (double escaping)
+                query = query:gsub("{lang}", createCaseInsensitivePattern(entry.name))
+                query = query:gsub("{name}", entry.name)
+
+                -- Concatenate the modified query string
+                result = result .. "\n" .. query
+            end
+        end
+    end
+
+    write(lang, "injections", result)
+  end
 end
 
-local function setup()
-	init()
+local function setup(config)
+	init(config)
 end
 
 return { setup = setup }
