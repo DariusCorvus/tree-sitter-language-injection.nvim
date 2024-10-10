@@ -147,6 +147,21 @@ return {
     - `html`
     - `css`
 - javascript
+
+  - comment inline
+    - `sql`
+    - `javascript`
+    - `typescript`
+    - `html`
+    - `css`
+  - comment above
+    - `sql`
+    - `javascript`
+    - `typescript`
+    - `html`
+    - `css`
+
+- typescript
   - comment inline
     - `sql`
     - `javascript`
