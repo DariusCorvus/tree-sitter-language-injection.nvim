@@ -43,7 +43,7 @@ which results in
 
 ### Configuration Of A New Language
 
-To add as example `javascript` `sql` string inline comment language injection you need to provide the query for `string` and the `langs`` you want to match, the`name` is the name of the treesitter parser and the match is the pattern to match the comment inside a string.
+To add as example `javascript` `sql` string inline comment language injection you need to provide the query for `string` and the `langs` you want to match, the`name` is the name of the treesitter parser and the match is the pattern to match the comment inside a string.
 
 To add as example `javascript` `sql` comment above language injection you need to provide the query for `comment` and the `langs` you want to match, the name is the name of the treesitter parser and the match is the pattern to match the comment.
 
@@ -146,8 +146,7 @@ return {
     - `typescript`
     - `html`
     - `css`
-- javascript
-
+- rust
   - comment inline
     - `sql`
     - `javascript`
@@ -160,7 +159,19 @@ return {
     - `typescript`
     - `html`
     - `css`
-
+- javascript
+  - comment inline
+    - `sql`
+    - `javascript`
+    - `typescript`
+    - `html`
+    - `css`
+  - comment above
+    - `sql`
+    - `javascript`
+    - `typescript`
+    - `html`
+    - `css`
 - typescript
   - comment inline
     - `sql`
