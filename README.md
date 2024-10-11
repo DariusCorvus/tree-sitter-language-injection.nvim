@@ -134,18 +134,24 @@ return {
 ## Built In Languages
 
 - python
+
   - comment inline
+
     - `sql`
     - `javascript`
     - `typescript`
     - `html`
     - `css`
+    - `python`
+
   - comment above
     - `sql`
     - `javascript`
     - `typescript`
     - `html`
     - `css`
+    - `python`
+
 - rust
   - comment inline
     - `sql`
@@ -153,12 +159,14 @@ return {
     - `typescript`
     - `html`
     - `css`
+    - `python`
   - comment above
     - `sql`
     - `javascript`
     - `typescript`
     - `html`
     - `css`
+    - `python`
 - javascript
   - comment inline
     - `sql`
@@ -166,12 +174,14 @@ return {
     - `typescript`
     - `html`
     - `css`
+    - `python`
   - comment above
     - `sql`
     - `javascript`
     - `typescript`
     - `html`
     - `css`
+    - `python`
 - typescript
   - comment inline
     - `sql`
@@ -179,9 +189,11 @@ return {
     - `typescript`
     - `html`
     - `css`
+    - `python`
   - comment above
     - `sql`
     - `javascript`
     - `typescript`
     - `html`
     - `css`
+    - `python`

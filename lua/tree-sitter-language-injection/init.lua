@@ -11,6 +11,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -27,6 +28,7 @@ local templates = {
 				{ name = "typescript", match = "^//+( )*{lang}( )*" },
 				{ name = "html", match = "^//+( )*{lang}( )*" },
 				{ name = "css", match = "^//+( )*{lang}( )*" },
+				{ name = "python", match = "^//+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
@@ -53,6 +55,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -69,6 +72,7 @@ local templates = {
 				{ name = "typescript", match = "^#+( )*{lang}( )*" },
 				{ name = "html", match = "^#+( )*{lang}( )*" },
 				{ name = "css", match = "^#+( )*{lang}( )*" },
+				{ name = "python", match = "^#+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
@@ -92,6 +96,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -108,6 +113,7 @@ local templates = {
 				{ name = "typescript", match = "^//+( )*{lang}( )*" },
 				{ name = "html", match = "^//+( )*{lang}( )*" },
 				{ name = "css", match = "^//+( )*{lang}( )*" },
+				{ name = "python", match = "^//+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
@@ -135,6 +141,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -151,6 +158,7 @@ local templates = {
 				{ name = "typescript", match = "^//+( )*{lang}( )*" },
 				{ name = "html", match = "^//+( )*{lang}( )*" },
 				{ name = "css", match = "^//+( )*{lang}( )*" },
+				{ name = "python", match = "^//+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
