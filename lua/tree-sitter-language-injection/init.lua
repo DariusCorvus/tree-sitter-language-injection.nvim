@@ -1,7 +1,3 @@
-local runtime_path = vim.api.nvim_list_runtime_paths()[1]
-local after_path = runtime_path .. "/after"
-local queries_path = runtime_path .. "/after/queries"
-
 local templates = {
 	rust = {
 		string = {
@@ -220,26 +216,26 @@ local function createCaseInsensitivePattern(str)
 	return pattern
 end
 
-local function createLanguageInjection(query, lang)
-	local pattern = createCaseInsensitivePattern(lang)
-	query = query:gsub("{lang}", lang)
-	query = query:gsub("{pattern}", pattern)
-	return query
-end
-
 local function write(lang, file, content)
+	local config_path = vim.fn.stdpath("config")
+	local queries_path = config_path .. "/after/queries"
 	local lang_path = queries_path .. "/" .. lang
 	if vim.fn.isdirectory(lang_path) == 0 then
 		vim.fn.mkdir(lang_path)
 	end
 
 	local file_handle = io.open(lang_path .. "/" .. file .. ".scm", "w")
-	io.output(file_handle)
-	io.write(content)
-	io.close(file_handle)
+	if file_handle then
+		io.output(file_handle)
+		io.write(content)
+		io.close(file_handle)
+	end
 end
 
 local function init(config)
+	local config_path = vim.fn.stdpath("config")
+	local after_path = config_path .. "/after"
+	local queries_path = config_path .. "/after/queries"
 	deepMerge(templates, config)
 	if vim.fn.isdirectory(after_path) == 0 then
 		vim.fn.mkdir(after_path)
@@ -249,7 +245,7 @@ local function init(config)
 	end
 	for lang, langData in pairs(templates) do
 		local result = ";extends\n"
-		for type, typeData in pairs(langData) do
+		for _, typeData in pairs(langData) do
 			-- Replace placeholders in the query string
 			if typeData.langs and typeData.query then -- Check if langs and query exist
 				for _, entry in ipairs(typeData.langs) do
