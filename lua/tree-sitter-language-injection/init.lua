@@ -3,6 +3,50 @@ local after_path = runtime_path .. "/after"
 local queries_path = runtime_path .. "/after/queries"
 
 local templates = {
+	rust = {
+		string = {
+			langs = {
+				{ name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" },
+				{ name = "javascript", match = "^(\r\n|\r|\n)*/{2,}( )*{lang}" },
+				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
+				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
+				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
+			},
+			query = [[
+; query
+;; string {name} injection
+((string_content) @injection.content
+  (#match? @injection.content "{match}")
+  (#set! injection.language "{name}"))
+        ]],
+		},
+		comment = {
+			langs = {
+				{ name = "sql", match = "^//+( )*{lang}( )*" },
+				{ name = "javascript", match = "^//+( )*{lang}( )*" },
+				{ name = "typescript", match = "^//+( )*{lang}( )*" },
+				{ name = "html", match = "^//+( )*{lang}( )*" },
+				{ name = "css", match = "^//+( )*{lang}( )*" },
+				{ name = "python", match = "^//+( )*{lang}( )*" },
+			},
+			query = [[
+; query
+;; comment {name} injection
+((line_comment) 
+ @comment .
+ (let_declaration 
+   value: 
+   (raw_string_literal
+     (string_content) 
+     @injection.content)
+    )
+  (#match? @comment "{match}")
+  (#set! injection.language "{name}")
+  )
+        ]],
+		},
+	},
 	python = {
 		string = {
 			langs = {
@@ -11,6 +55,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -27,6 +72,7 @@ local templates = {
 				{ name = "typescript", match = "^#+( )*{lang}( )*" },
 				{ name = "html", match = "^#+( )*{lang}( )*" },
 				{ name = "css", match = "^#+( )*{lang}( )*" },
+				{ name = "python", match = "^#+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
@@ -50,6 +96,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -66,6 +113,7 @@ local templates = {
 				{ name = "typescript", match = "^//+( )*{lang}( )*" },
 				{ name = "html", match = "^//+( )*{lang}( )*" },
 				{ name = "css", match = "^//+( )*{lang}( )*" },
+				{ name = "python", match = "^//+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
@@ -93,6 +141,7 @@ local templates = {
 				{ name = "typescript", match = "^(\r\n|\r|\n)//+( )*{lang}" },
 				{ name = "html", match = "^(\r\n|\r|\n)\\<\\!-{2,}( )*{lang}( )*-{2,}\\>" },
 				{ name = "css", match = "^(\r\n|\r|\n)/\\*+( )*{lang}( )*\\*+/" },
+				{ name = "python", match = "^(\r\n|\r|\n)*#+( )*{lang}" },
 			},
 			query = [[
 ; query
@@ -109,6 +158,7 @@ local templates = {
 				{ name = "typescript", match = "^//+( )*{lang}( )*" },
 				{ name = "html", match = "^//+( )*{lang}( )*" },
 				{ name = "css", match = "^//+( )*{lang}( )*" },
+				{ name = "python", match = "^//+( )*{lang}( )*" },
 			},
 			query = [[
 ; query
