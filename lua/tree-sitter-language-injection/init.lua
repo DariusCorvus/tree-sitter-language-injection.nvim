@@ -220,13 +220,6 @@ local function createCaseInsensitivePattern(str)
 	return pattern
 end
 
-local function createLanguageInjection(query, lang)
-	local pattern = createCaseInsensitivePattern(lang)
-	query = query:gsub("{lang}", lang)
-	query = query:gsub("{pattern}", pattern)
-	return query
-end
-
 local function write(lang, file, content)
 	local lang_path = queries_path .. "/" .. lang
 	if vim.fn.isdirectory(lang_path) == 0 then
