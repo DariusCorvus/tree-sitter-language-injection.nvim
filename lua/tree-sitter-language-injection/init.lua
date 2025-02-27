@@ -227,9 +227,11 @@ local function write(lang, file, content)
 	end
 
 	local file_handle = io.open(lang_path .. "/" .. file .. ".scm", "w")
-	io.output(file_handle)
-	io.write(content)
-	io.close(file_handle)
+	if file_handle then
+		io.output(file_handle)
+		io.write(content)
+		io.close(file_handle)
+	end
 end
 
 local function init(config)
