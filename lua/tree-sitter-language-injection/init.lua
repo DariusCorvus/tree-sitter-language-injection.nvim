@@ -1,6 +1,4 @@
-local default_config = {
-	path = vim.fn.stdpath("config") .. "/queries",
-}
+local default_config = {}
 
 local config = {}
 local M = {}
@@ -269,7 +267,9 @@ local function init()
 end
 
 function M.setup(user_config)
-	user_config = user_config or {}
+	user_config = user_config or {
+		path = vim.fn.stdpath("config") .. "/queries",
+	}
 	config = vim.tbl_deep_extend("force", default_config, user_config)
 	init()
 end
