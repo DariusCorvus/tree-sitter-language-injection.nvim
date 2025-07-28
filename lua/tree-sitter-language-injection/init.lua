@@ -241,10 +241,7 @@ end
 local function init()
 	local queries_path = config.path
 	local queries = config.queries or {}
-	deepMerge(templates, queries)
-	if vim.fn.isdirectory(queries_path) == 0 then
-		vim.fn.mkdir(queries_path)
-	end
+	deepMerge(templates, config)
 	if vim.fn.isdirectory(queries_path) == 0 then
 		vim.fn.mkdir(queries_path)
 	end
@@ -273,7 +270,9 @@ local function init()
 end
 
 function M.setup(user_config)
-	user_config = user_config or {}
+	user_config = user_config or {
+		path = vim.fn.stdpath("config") .. "/queries",
+	}
 	config = vim.tbl_deep_extend("force", default_config, user_config)
 	init()
 end
