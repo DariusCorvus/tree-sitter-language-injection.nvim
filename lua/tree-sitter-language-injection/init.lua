@@ -1,9 +1,8 @@
-local default_config = {
-  path = '/queries',
-}
-
-local config = {}
 local M = {}
+local default_config = {
+  path = vim.fn.stdpath 'config',
+}
+local config = {}
 
 local templates = {
   rust = {
@@ -224,7 +223,7 @@ local function createCaseInsensitivePattern(str)
 end
 
 local function write(lang, file, content)
-  local queries_path = vim.fn.stdpath 'config' .. config.path
+  local queries_path = config.path
   local lang_path = queries_path .. '/' .. lang
   if vim.fn.isdirectory(lang_path) == 0 then
     vim.fn.mkdir(lang_path)
@@ -239,7 +238,7 @@ local function write(lang, file, content)
 end
 
 local function init()
-  local queries_path = vim.fn.stdpath 'config' .. config.path
+  local queries_path = config.path
   deepMerge(templates, config)
   if vim.fn.isdirectory(queries_path) == 0 then
     vim.fn.mkdir(queries_path)
@@ -275,4 +274,5 @@ function M.setup(user_config)
   config = vim.tbl_deep_extend('force', default_config, user_config)
   init()
 end
+
 return M
