@@ -275,6 +275,7 @@ end
 function M.setup(user_config)
 	user_config = user_config or {}
 	config = vim.tbl_deep_extend("force", default_config, user_config)
+
 	init()
 end
 
