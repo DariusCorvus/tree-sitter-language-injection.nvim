@@ -1,7 +1,7 @@
 local M = {}
 local default_config = {
   path = vim.fn.stdpath 'config',
-  templates = {},
+  queries = {},
 }
 local config = {}
 
@@ -240,7 +240,7 @@ end
 
 local function init()
   local queries_path = config.path
-  local queries = config.templates or {}
+  local queries = config.queries or {}
   deepMerge(templates, queries)
   if vim.fn.isdirectory(queries_path) == 0 then
     vim.fn.mkdir(queries_path)
