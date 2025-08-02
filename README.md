@@ -1,15 +1,64 @@
 # tree-sitter-language-injection.nvim
 
-A NVIM Plugin which applies inline language injections, when a string above contains the name of the language or the string contains a comment with the language name.
-You can configure it with own queries for languages that aren't built in yet.
+[![Neovim](https://img.shields.io/badge/Neovim-%3E=0.9.0-blue.svg)](https://neovim.io/)
+[![tree-sitter](https://img.shields.io/badge/tree--sitter-supported-brightgreen)](https://tree-sitter.github.io/tree-sitter/)
+
+_Neovim plugin for inline language injection and syntax highlighting using Tree-sitter._
+
+<!--toc:start-->
+
+- [tree-sitter-language-injection.nvim](#tree-sitter-language-injectionnvim)
+  - [Overview](#overview)
+    - [Why use this plugin?](#why-use-this-plugin)
+  - [Features](#features)
+  - [Examples](#examples)
+    - [1. Inline Comment Annotation](#1-inline-comment-annotation)
+    - [2. Above-line Comment Annotation](#2-above-line-comment-annotation)
+  - [Configuration](#configuration)
+  - [Installation](#installation)
+    - [Requirements](#requirements)
+    - [Using Packer](#using-packer)
+    - [Using Lazy](#using-lazy)
+    - [Setup](#setup)
+  - [Built-in Language Support](#built-in-language-support)
+  - [Screenshots](#screenshots)
+  - [Troubleshooting](#troubleshooting)
+    - [Issue: Injection Highlighting Gets Replaced by LSP Semantic Highlighting](#issue-injection-highlighting-gets-replaced-by-lsp-semantic-highlighting)
+      - [Disabling semantic highlighting](#disabling-semantic-highlighting)
+      - [Disabling semantic highlighting for strings](#disabling-semantic-highlighting-for-strings)
+  - [Contributing & Language Support](#contributing-language-support)
+  - [License](#license)
+  - [Credits](#credits)
+  <!--toc:end-->
+
+---
+
+## Overview
+
+**tree-sitter-language-injection.nvim** automatically applies syntax highlighting to code snippets embedded as strings or comments in your code, based on inline language annotations. For example, SQL queries inside JavaScript/TypeScript strings can be highlighted as SQL if marked accordingly.
+
+> ![Inline SQL in TypeScript example](https://raw.githubusercontent.com/DariusCorvus/DariusCorvus/main/assets/wezterm-gui_cchWP58tx2.png)
+
+### Why use this plugin?
+
+- Improved readability for embedded code (e.g. SQL, HTML in JS/TS, Python, etc.)
+- Customizable for any language and annotation style
+- Seamless integration with [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
+
+---
 
 ## Features
 
-### Comment Inline
+- **Inline comment annotation**: Add a comment at the start of a string with the language name to enable syntax highlighting for the embedded code.
+- **Above-line comment annotation**: Place a comment above a string/variable with the language name to trigger the injection.
+- **Configurable injections**: Easily extend or override language injections using Lua tables and custom Tree-sitter queries.
+- **Built-in support**: Out-of-the-box support for Python, Rust, JavaScript, and TypeScript, including common web and data languages.
 
-When a string is found, and the first line is language specifc comment, for the desired language, followed by the language name, syntax highlighting gets applied.
+---
 
-as example we use the language `typescript` and want that the string gets highlighted as `sql`
+## Examples
+
+### 1. Inline Comment Annotation
 
 ```typescript
 const select = `
@@ -19,15 +68,13 @@ WHERE active = 1
 `;
 ```
 
-which results in
+Result:
 
 ![typescript_inline_sql](https://raw.githubusercontent.com/DariusCorvus/DariusCorvus/main/assets/wezterm-gui_cchWP58tx2.png)
 
-### Comment Above
+---
 
-When a comment is found above a variable, and starts with the name of the desired language, syntax highlighting gets applied.
-
-as example we use the language `typescript` and want that the string gets highlighted as `sql`
+### 2. Above-line Comment Annotation
 
 ```typescript
 // sql
@@ -37,83 +84,79 @@ WHERE active = 1
 `;
 ```
 
-which results in
+Result:
 
 ![typescript_above_sql](https://raw.githubusercontent.com/DariusCorvus/DariusCorvus/main/assets/wezterm-gui_WDmWbPhxb9.png)
 
-### Configuration Of A New Language
+---
 
-To add as example `javascript` `sql` string inline comment language injection you need to provide the query for `string` and the `langs` you want to match, the`name` is the name of the treesitter parser and the match is the pattern to match the comment inside a string.
+## Configuration
 
-To add as example `javascript` `sql` comment above language injection you need to provide the query for `comment` and the `langs` you want to match, the name is the name of the treesitter parser and the match is the pattern to match the comment.
-
-it's already inbuilt by the way, so tinker with a language you need or create a issue and i see if i can help.
+You can add or override language injections by passing a table to `setup`. For example:
 
 ```lua
-return {
-  "dariuscorvus/tree-sitter-language-injection.nvim",
-  opts = {
-    javascript = {
-      string = {
-        langs = {
-          { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}"}
-        },
-        query = [[
-; query
-;; string {name} injection
-((string_fragment) @injection.content
-                   (#match? @injection.content "{match}")
-                   (#set! injection.language "{name}"))
-        ]]
+require("tree-sitter-language-injection").setup({
+  javascript = {
+    string = {
+      langs = {
+        { name = "sql", match = "^(\r\n|\r|\n)*-{2,}( )*{lang}" }
       },
-      comment = {
-        langs = {
-          { name = "sql", match = "^//+( )*{lang}( )*"}
-        },
-        query = [[
-; query
-;; comment {name} injection
-((comment)
- @comment .
- (lexical_declaration
-   (variable_declarator
-     value: [
-             (string(string_fragment)@injection.content)
-             (template_string(string_fragment)@injection.content)
-             ]@injection.content)
-   )
-  (#match? @comment "{match}")
-  (#set! injection.language "{name}")
- )
-        ]]
-      }
+      query = [[
+        ; query
+        ;; string {name} injection
+        ((string_fragment) @injection.content
+                        (#match? @injection.content "{match}")
+                        (#set! injection.language "{name}"))
+      ]]
+    },
+    comment = {
+      langs = {
+        { name = "sql", match = "^//+( )*{lang}( )*" }
+      },
+      query = [[
+        ; query
+        ;; comment {name} injection
+        ((comment) @comment .
+          (lexical_declaration
+            (variable_declarator
+              value: [
+                (string(string_fragment)@injection.content)
+                (template_string(string_fragment)@injection.content)
+              ]@injection.content)
+          )
+          (#match? @comment "{match}")
+          (#set! injection.language "{name}")
+        )
+      ]]
     }
   }
-}
+})
 ```
 
-### Configurable
+It's already built-in for many languages, but you can tinker with a language you need or [create an issue](https://github.com/DariusCorvus/tree-sitter-language-injection.nvim/issues/new) and I will help if possible.
 
-Now its possible to add languages and their treesitter scm quiries via the setup.
-
-before the configuration:
-
-![Screenshot 2024-10-10 111556](https://github.com/user-attachments/assets/2f92846e-5b8c-4916-b049-7d0b68cc8155)
-
-configuration:
-
-![Screenshot 2024-10-10 111439](https://github.com/user-attachments/assets/788a512f-47ab-49b8-b438-661b746a23c2)
-
-after the configuration:
-
-![Unbenannt](https://github.com/user-attachments/assets/16a48553-653c-4bc3-8b6a-11ed9efcff71)
+---
 
 ## Installation
 
-### Packer
+### Requirements
+
+- **Neovim >= 0.9.0**
+- **nvim-treesitter** must be installed and set up
+
+### Using Packer
 
 ```lua
-use({"dariuscorvus/tree-sitter-language-injection.nvim", after="nvim-treesitter"})
+use({ "dariuscorvus/tree-sitter-language-injection.nvim", after = "nvim-treesitter" })
+```
+
+### Using Lazy
+
+```lua
+{
+  "dariuscorvus/tree-sitter-language-injection.nvim",
+  opts = {}, -- calls setup()
+}
 ```
 
 ### Setup
@@ -122,79 +165,34 @@ use({"dariuscorvus/tree-sitter-language-injection.nvim", after="nvim-treesitter"
 require("tree-sitter-language-injection").setup()
 ```
 
-### Lazy
+---
 
-```lua
-return {
-  "dariuscorvus/tree-sitter-language-injection.nvim",
-  opts = {} 'calls the setup
-}
-```
+## Built-in Language Support
 
-## Built In Languages
+| Host Language | Comment Inline | Comment Above | Supported Embedded             |
+| ------------- | :------------: | :-----------: | :----------------------------- |
+| Python        |       ✅       |      ✅       | SQL, JS, TS, HTML, CSS, Python |
+| Rust          |       ✅       |      ✅       | SQL, JS, TS, HTML, CSS, Python |
+| JavaScript    |       ✅       |      ✅       | SQL, JS, TS, HTML, CSS, Python |
+| TypeScript    |       ✅       |      ✅       | SQL, JS, TS, HTML, CSS, Python |
 
-- python
-  - comment inline
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
+---
 
-  - comment above
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
+## Screenshots
 
-- rust
-  - comment inline
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
-  - comment above
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
-- javascript
-  - comment inline
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
-  - comment above
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
-- typescript
-  - comment inline
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
-  - comment above
-    - `sql`
-    - `javascript`
-    - `typescript`
-    - `html`
-    - `css`
-    - `python`
+**Before configuration:**
+
+![Before configuration](https://github.com/user-attachments/assets/2f92846e-5b8c-4916-b049-7d0b68cc8155)
+
+**Configuring:**
+
+![Configuration](https://github.com/user-attachments/assets/788a512f-47ab-49b8-b438-661b746a23c2)
+
+**After configuration:**
+
+![After configuration](https://github.com/user-attachments/assets/16a48553-653c-4bc3-8b6a-11ed9efcff71)
+
+---
 
 ## Troubleshooting
 
@@ -256,3 +254,13 @@ I welcome and encourage pull requests for:
 
 If you have a reasonable request or need help implementing new support, feel free to open an issue or pull request—I'm happy to assist!  
 Let's make this plugin work for as many languages and workflows as possible.
+
+## License
+
+MIT
+
+---
+
+## Credits
+
+Created by [DariusCorvus](https://github.com/DariusCorvus).
