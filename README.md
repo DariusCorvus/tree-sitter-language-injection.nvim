@@ -29,7 +29,7 @@ _Neovim plugin for inline language injection and syntax highlighting using Tree-
     - [Issue: Injection Highlighting Gets Replaced by LSP Semantic Highlighting](#issue-injection-highlighting-gets-replaced-by-lsp-semantic-highlighting)
       - [Disabling semantic highlighting](#disabling-semantic-highlighting)
       - [Disabling semantic highlighting for strings](#disabling-semantic-highlighting-for-strings)
-  - [Contributing & Language Support](#contributing-language-support)
+  - [Contributing & Language Support](#contributing--language-support)
   - [License](#license)
   - [Credits](#credits)
   <!--toc:end-->
