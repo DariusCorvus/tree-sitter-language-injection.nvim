@@ -134,9 +134,7 @@ return {
 ## Built In Languages
 
 - python
-
   - comment inline
-
     - `sql`
     - `javascript`
     - `typescript`
@@ -207,6 +205,9 @@ When you open a file, injected language highlighting works as expected at first.
 
 **Solution:**  
 This happens because some LSP configurations (especially with Neovim's built-in LSP client) enable `semanticTokensProvider`, which can override Tree-sitter-based highlights—including those provided by this plugin.
+You can choose between disabling semantic highlighting or only the semantic highlighting for strings.
+
+#### Disabling semantic highlighting
 
 To fix this, you can disable semantic tokens in your LSP setup. For example, if you use `nvim-lspconfig`, add the following to your LSP configuration:
 
@@ -219,7 +220,24 @@ end
 
 You can add this to your `on_attach` function for the relevant language servers, or globally. After this change, your injected highlights should remain visible even after the LSP attaches.
 
-**References:**  
+#### Disabling semantic highlighting for strings
+
+You can automatically disable semantic highlighting for strings when any LSP attaches by placing this in your Neovim configuration:
+
+```lua
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    -- Only clear the LSP string highlight group to preserve injection highlights
+    vim.api.nvim_set_hl(0, "@lsp.type.string", {})
+  end,
+})
+```
+
+Place this in your `init.lua` or a relevant plugin setup file.  
+This ensures that the workaround is applied for every LSP client, preserving Tree-sitter injection highlights for strings without disabling all semantic tokens.
+
+**References:**
+
 - [Issue #12: injection gets replaced with semantic highlighting after lsp loads](https://github.com/DariusCorvus/tree-sitter-language-injection.nvim/issues/12)
 
 ---
