@@ -197,3 +197,44 @@ return {
     - `html`
     - `css`
     - `python`
+
+## Troubleshooting
+
+### Issue: Injection Highlighting Gets Replaced by LSP Semantic Highlighting
+
+**Problem:**  
+When you open a file, injected language highlighting works as expected at first. However, after your LSP (Language Server Protocol) attaches, Neovim's semantic highlighting takes over, and the injection highlighting from this plugin disappears.
+
+**Solution:**  
+This happens because some LSP configurations (especially with Neovim's built-in LSP client) enable `semanticTokensProvider`, which can override Tree-sitter-based highlights—including those provided by this plugin.
+
+To fix this, you can disable semantic tokens in your LSP setup. For example, if you use `nvim-lspconfig`, add the following to your LSP configuration:
+
+```lua
+on_attach = function(client, bufnr)
+  -- Disable semantic tokens to preserve Tree-sitter injection highlights
+  client.server_capabilities.semanticTokensProvider = nil
+end
+```
+
+You can add this to your `on_attach` function for the relevant language servers, or globally. After this change, your injected highlights should remain visible even after the LSP attaches.
+
+**References:**  
+- [Issue #12: injection gets replaced with semantic highlighting after lsp loads](https://github.com/DariusCorvus/tree-sitter-language-injection.nvim/issues/12)
+
+---
+
+If you experience other issues, please check [open issues](https://github.com/DariusCorvus/tree-sitter-language-injection.nvim/issues) or open a new one with detailed information.
+
+---
+
+## Contributing & Language Support
+
+I welcome and encourage pull requests for:
+
+- **New language support** (host languages)
+- **Additional embedded/injected languages**
+- Improvements to existing injections and matching
+
+If you have a reasonable request or need help implementing new support, feel free to open an issue or pull request—I'm happy to assist!  
+Let's make this plugin work for as many languages and workflows as possible.
