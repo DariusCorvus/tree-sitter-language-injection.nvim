@@ -10,7 +10,7 @@ _Neovim plugin for inline language injection and syntax highlighting using Tree-
 <!--toc:start-->
 
 - [tree-sitter-language-injection.nvim](#tree-sitter-language-injectionnvim)
-  - Table Of Content
+  - [Table Of Content](#table-of-content)
   - [Overview](#overview)
     - [Why use this plugin?](#why-use-this-plugin)
   - [Features](#features)
